@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Wedding Photo Shoot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1>Admin Panel</h1>
+    <p class="subtitle">Control Current / Up Next Group</p>
+  </header>
+
+  <main>
+    <section id="login-section" class="login-section">
+      <form id="login-form">
+        <label for="password">Enter Admin Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required />
+        <button type="submit">Login</button>
+        <p id="login-error" class="error-text" hidden>Incorrect password.</p>
+      </form>
+    </section>
+
+    <section id="admin-panel" class="admin-panel" hidden>
+      <div id="feature-disabled-msg" class="notice" hidden>
+        Live status feature is currently disabled. Enable it in <code>js/config.js</code> (set <code>ENABLE_LIVE_STATUS</code> to <code>true</code>).
+      </div>
+
+      <div id="admin-controls">
+        <div class="live-status status-preview">
+          <div class="status-card current">
+            <span class="status-label">Now Photographing</span>
+            <span id="admin-current-name" class="status-value">—</span>
+          </div>
+          <div class="status-card next">
+            <span class="status-label">Up Next</span>
+            <span id="admin-next-name" class="status-value">—</span>
+          </div>
+        </div>
+
+        <div class="admin-actions">
+          <button id="reset-status-btn" class="secondary-btn" type="button">Reset / Clear Status</button>
+          <button id="logout-btn" class="secondary-btn" type="button">Log Out</button>
+        </div>
+
+        <h2>Select Current Group</h2>
+        <p class="hint">Click a group below to mark it as the current group being photographed. "Up Next" is worked out automatically.</p>
+        <div id="admin-group-list" class="group-list"><!-- rendered by js/admin.js --></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p><a href="index.html">&larr; Back to main page</a></p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

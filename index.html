@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wedding Photo Shoot Arrangement</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <header class="site-header">
+    <h1 id="site-title">Wedding Photo Shoot Arrangement</h1>
+    <p class="subtitle">Family &amp; Group Photo Order</p>
+  </header>
+
+  <main>
+    <section id="live-status" class="live-status" hidden>
+      <div class="status-card current">
+        <span class="status-label">Now Photographing</span>
+        <span id="current-group-name" class="status-value">—</span>
+      </div>
+      <div class="status-card next">
+        <span class="status-label">Up Next</span>
+        <span id="next-group-name" class="status-value">—</span>
+      </div>
+    </section>
+
+    <section id="group-list-section">
+      <h2>Photo Group List</h2>
+      <div id="group-list" class="group-list"><!-- rendered by js/app.js --></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Made with love for our wedding day.</p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
