@@ -8,7 +8,7 @@ const CONFIG = {
   // haven't found an admin yet) - the site will then just show the plain
   // group list with no current/next banner and no admin controls.
   // This is a compile-time (source code) switch - just edit and re-deploy.
-  ENABLE_LIVE_STATUS: true,
+  ENABLE_LIVE_STATUS: false,
 
   // Hashed admin password for coordinate.html (not stored in plain text so
   // it isn't readable at a glance). To change the password, have this value
