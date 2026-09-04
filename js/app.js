@@ -29,7 +29,7 @@
     });
   }
 
-  function renderLiveStatus() {
+  function renderLiveStatus(status) {
     const section = document.getElementById("live-status");
 
     if (!CONFIG.ENABLE_LIVE_STATUS) {
@@ -39,7 +39,7 @@
     }
 
     section.hidden = false;
-    const { currentId } = StatusStore.getStatus();
+    const currentId = status ? status.currentId : null;
     const { current, next } = resolveCurrentAndNext(currentId);
 
     document.getElementById("current-group-name").textContent = current
@@ -54,9 +54,13 @@
     renderGroupList(currentId);
   }
 
-  renderLiveStatus();
-
+  // subscribe() calls back immediately with the current value, then again
+  // every time it changes - so this stays live with no manual page refresh
+  // needed (instantly on every device when Firebase is configured, or
+  // instantly across tabs on this device otherwise).
   if (CONFIG.ENABLE_LIVE_STATUS) {
     StatusStore.subscribe(renderLiveStatus);
+  } else {
+    renderLiveStatus(null);
   }
 })();

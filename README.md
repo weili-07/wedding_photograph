@@ -42,30 +42,95 @@ Open [`js/config.js`](js/config.js) to change:
 - `ADMIN_PASSWORD_HASH` - a hashed version of the admin password for
   `coordinate.html`, so the real password isn't sitting in plain text in the
   source code. To change the password, ask for `ADMIN_PASSWORD_HASH` to be
-  regenerated for the new password rather than editing it by hand.
+  regenerated for the new password rather than editing it by hand. This is
+  used as a fallback - if Firebase is connected (see below) and a
+  `wedding_admin_password_hash` value exists there, that takes priority
+  instead, so the password can be rotated from the Firebase console
+  without redeploying.
 - `SITE_TITLE` - page title/heading shown on the public page.
 
 ## Admin access
 
 Go to `coordinate.html` and enter the password. Once logged in for that
-browser tab/session, click any group in the list to mark it as the current group.
-"Up Next" is worked out automatically as the next item in the list. Use
-"Reset / Clear Status" to go back to "Not started yet".
+browser tab/session, click any group in the list to mark it as the current
+group. The change appears immediately everywhere with no page refresh
+needed - instantly on every device once Firebase is connected (see below),
+or instantly across tabs on this device otherwise. "Up Next" is worked out
+automatically as the next item in the list. Use "Reset / Clear Status" to
+go back to "Not started yet".
+
+## Live sync across every device (optional Firebase setup)
+
+By default (no setup needed), the current-group status and the admin
+password check both only use this browser/device. To make the status
+update live on **everyone's own phone** - with no manual refresh, since
+Firebase keeps a live connection open and pushes changes the instant they
+happen - and to allow rotating the admin password from the Firebase
+console without redeploying, connect a free Firebase Realtime Database. No
+server or paid plan needed.
+
+1. Go to <https://console.firebase.google.com/> and create a new project
+   (Google Analytics isn't needed for this - you can turn it off).
+2. In the project, open **Build → Realtime Database** and click
+   **Create Database**.
+3. Choose a location, choose **Locked mode** for the starting rules (we'll
+   set proper rules next), then click **Enable**.
+4. Open the **Rules** tab of the Realtime Database and replace the rules
+   with:
+
+   ```json
+   {
+     "rules": {
+       ".read": false,
+       ".write": false,
+       "wedding_current_status_v1": {
+         ".read": true,
+         ".write": true
+       },
+       "wedding_admin_password_hash": {
+         ".read": true,
+         ".write": false
+       }
+     }
+   }
+   ```
+
+   Click **Publish**. This only opens up the one status value (read and
+   write, since the admin page needs to update it) and the password hash
+   (read-only from the site - you can still change it directly in the
+   Firebase console's Data tab, just not website visitors).
+5. Go to **Project settings** (gear icon) → **General** tab → scroll to
+   **Your apps** → click the **</>** (Web) icon → give it any nickname →
+   **Register app** (Firebase Hosting isn't needed).
+6. Firebase shows a `firebaseConfig` object - copy those values into
+   [`js/firebase-config.js`](js/firebase-config.js), replacing the
+   `"PASTE_ME"` placeholders. These values aren't secret - access is
+   controlled by the rules above, not by hiding this config, so it's fine
+   to commit them.
+7. *(Optional)* To store the admin password in Firebase instead of relying
+   only on the hash in `js/config.js`: in the Realtime Database **Data**
+   tab, add a new key `wedding_admin_password_hash` with the hash as its
+   value (generate it with the browser-console snippet mentioned in the
+   Settings section above). Update this value any time from the console to
+   rotate the password without touching the code.
+8. Refresh the site - it automatically detects the config and switches to
+   live sync. The admin page shows whether live sync is currently on or
+   off.
 
 ## Important limitations
 
 - **Password protection is basic.** Because this is a static site, the
   password check happens in the browser. Only a *hash* of the password is
-  stored in the source (not the plain password), so it isn't readable at a
-  glance - but someone with the source code could still try to brute-force a
+  used (not the plain password), whether it comes from `js/config.js` or
+  the optional Firebase value, so it isn't readable at a glance - but
+  someone could still get hold of that hash (from the source, or from the
+  network request if using Firebase) and try to brute-force a
   short/guessable password offline. It only keeps casual visitors out - do
   not reuse a sensitive password.
-- **The current/next status only syncs within the same browser** (e.g.
-  multiple tabs open on one laptop/kiosk), using `localStorage`. It does
-  **not** sync automatically across different phones/devices. If you need
-  every guest's own phone to update live from one admin action, you would
-  need to add a small backend (e.g. Firebase) - this can be added later
-  without redesigning the site.
+- **The current/next status only syncs across every device once you've set
+  up the optional Firebase connection above.** Without it, status only
+  syncs within the same browser (e.g. multiple tabs open on one
+  laptop/kiosk), using `localStorage`.
 
 ## Deploying to GitHub Pages
 

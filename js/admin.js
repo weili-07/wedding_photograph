@@ -11,8 +11,8 @@
   const featureDisabledMsg = document.getElementById("feature-disabled-msg");
   const adminControls = document.getElementById("admin-controls");
 
-  function renderAdminPanel() {
-    const { currentId } = StatusStore.getStatus();
+  function renderAdminPanel(status) {
+    const currentId = status ? status.currentId : null;
     const { current, next } = resolveCurrentAndNext(currentId);
 
     document.getElementById("admin-current-name").textContent = current
@@ -23,6 +23,15 @@
       : current
       ? "All done!"
       : "—";
+
+    const syncNote = document.getElementById("sync-mode-note");
+    if (syncNote) {
+      syncNote.textContent = StatusStore.isLive
+        ? "Live sync is ON - updates reach every device instantly."
+        : "Live sync is OFF - only updates browsers/tabs on this device (Firebase not configured).";
+      syncNote.classList.toggle("sync-live", StatusStore.isLive);
+      syncNote.classList.toggle("sync-local", !StatusStore.isLive);
+    }
 
     const container = document.getElementById("admin-group-list");
     container.innerHTML = "";
@@ -44,7 +53,6 @@
       row.textContent = group.name;
       row.addEventListener("click", () => {
         StatusStore.setStatus({ currentId: group.id });
-        renderAdminPanel();
       });
       container.appendChild(row);
     });
@@ -62,13 +70,14 @@
 
     featureDisabledMsg.hidden = true;
     adminControls.hidden = false;
-    renderAdminPanel();
+    // subscribe() calls back immediately with the current value, then again
+    // every time it changes - the panel updates live with no manual page
+    // refresh needed.
     StatusStore.subscribe(renderAdminPanel);
   }
 
   document.getElementById("reset-status-btn").addEventListener("click", () => {
     StatusStore.clearStatus();
-    renderAdminPanel();
   });
 
   document.getElementById("logout-btn").addEventListener("click", () => {
@@ -90,8 +99,14 @@
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const value = document.getElementById("password").value;
-    const hashed = await hashText(value);
-    if (hashed === CONFIG.ADMIN_PASSWORD_HASH) {
+    // Checks against Firebase first (if configured), falling back to the
+    // hash hardcoded in js/config.js otherwise - see fetchAdminPasswordHash
+    // in storage.js.
+    const [hashed, expectedHash] = await Promise.all([
+      hashText(value),
+      fetchAdminPasswordHash(),
+    ]);
+    if (hashed === expectedHash) {
       sessionStorage.setItem(SESSION_KEY, "1");
       loginError.hidden = true;
       showAdminPanel();

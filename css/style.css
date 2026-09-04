@@ -220,6 +220,24 @@ main {
   margin-bottom: 1rem;
 }
 
+.sync-note {
+  font-size: 0.85rem;
+  margin: -0.5rem 0 1rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.sync-note.sync-live {
+  background: #e6f4ea;
+  color: #1e7a34;
+}
+
+.sync-note.sync-local {
+  background: #fff4e5;
+  color: #8a5a00;
+}
+
 .hint {
   color: var(--color-muted);
   font-size: 0.9rem;
